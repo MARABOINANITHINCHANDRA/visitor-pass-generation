@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisitEase | Visitor Management</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-mark">V</div><div><b>VisitEase</b><small>SMART VISITOR SYSTEM</small></div></div>
+      <div class="nav-label">WORKSPACE</div>
+      <button class="nav-link active" data-page="dashboard"><span>▦</span> Dashboard</button>
+      <button class="nav-link" data-page="register"><span>＋</span> Register visitor</button>
+      <button class="nav-link" data-page="passes"><span>▣</span> Digital passes</button>
+      <button class="nav-link" data-page="tracking"><span>◷</span> Live tracking</button>
+      <button class="nav-link" data-page="approvals"><span>✓</span> Approvals <i id="approvalBadge">0</i></button>
+      <button class="nav-link" data-page="history"><span>▤</span> Visitor history</button>
+      <button class="nav-link" data-page="reports"><span>▥</span> Reports</button>
+      <div class="sidebar-bottom"><div class="profile"><div class="avatar">AD</div><div><b>Admin User</b><small>Administrator</small></div><span>●</span></div><button id="resetDemo" class="reset-btn">↻ Reset demo data</button></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu">☰</button>
+        <div><div class="eyebrow">VISITOR MANAGEMENT</div><h1 id="pageTitle">Dashboard overview</h1></div>
+        <div class="top-actions"><span class="date-pill" id="todayLabel"></span><button class="icon-btn" title="Notifications">♧</button><div class="top-avatar">AD</div></div>
+      </header>
+
+      <section class="page active" id="page-dashboard">
+        <div class="welcome"><div><p class="eyebrow light">WELCOME BACK, ADMIN</p><h2>Your front desk, <em>under control.</em></h2><p>Monitor visitor activity and manage every entry from one place.</p></div><button class="btn btn-white" data-go="register">＋ Register a visitor</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Total visitors</span><b class="stat-icon blue">♙</b></div><strong id="statTotal">0</strong><small>All registered visitors</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Today's visitors</span><b class="stat-icon purple">▣</b></div><strong id="statToday">0</strong><small>Registered today</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Currently inside</span><b class="stat-icon green">◉</b></div><strong id="statInside">0</strong><small>Active check-ins</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Pending approvals</span><b class="stat-icon orange">◷</b></div><strong id="statPending">0</strong><small>Waiting for approval</small></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel chart-panel"><div class="panel-heading"><div><h3>Visitor activity</h3><p>Visitor registrations over the last 7 days</p></div><span class="tag">LAST 7 DAYS</span></div><canvas id="visitorChart" height="115"></canvas></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Visitor status</h3><p>Current pass distribution</p></div></div><div class="status-list" id="statusSummary"></div></article>
+        </div>
+        <article class="panel"><div class="panel-heading"><div><h3>Recent visitors</h3><p>Latest visitor registrations</p></div><button class="text-btn" data-go="history">View all →</button></div><div class="table-wrap"><table><thead><tr><th>VISITOR</th><th>VISITOR ID</th><th>HOST</th><th>DATE</th><th>STATUS</th></tr></thead><tbody id="recentTable"></tbody></table></div></article>
+      </section>
+
+      <section class="page" id="page-register">
+        <div class="page-intro"><div><h2>Register a visitor</h2><p>Enter visitor details to create a digital visitor pass.</p></div><span class="tag">NEW VISIT</span></div>
+        <form id="visitorForm" class="panel form-panel">
+          <div class="form-section-title"><span>01</span><div><h3>Personal information</h3><p>Basic details about the visitor</p></div></div>
+          <div class="form-grid">
+            <label>Full name *<input name="name" required placeholder="e.g. Rahul Sharma"></label>
+            <label>Mobile number *<input name="phone" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number"></label>
+            <label>Email address<input name="email" type="email" placeholder="visitor@example.com"></label>
+            <label>Company / Organization<input name="company" placeholder="Company name"></label>
+          </div>
+          <div class="form-section-title"><span>02</span><div><h3>Visit information</h3><p>Who are they visiting and why?</p></div></div>
+          <div class="form-grid">
+            <label>Person to meet *<input name="host" required placeholder="Employee name"></label>
+            <label>Department<select name="department" required><option value="">Select department</option><option>Administration</option><option>Human Resources</option><option>Engineering</option><option>Finance</option><option>Sales</option><option>Operations</option><option>Other</option></select></label>
+            <label>Purpose of visit *<select name="purpose" required><option value="">Select purpose</option><option>Business meeting</option><option>Interview</option><option>Delivery</option><option>Personal visit</option><option>Maintenance</option><option>Other</option></select></label>
+            <label>Expected duration<select name="duration"><option>30 minutes</option><option>1 hour</option><option>2 hours</option><option>Half day</option><option>Full day</option></select></label>
+            <label>Visit date *<input name="visitDate" type="date" required></label>
+            <label>Expected entry time<input name="entryTime" type="time" required></label>
+          </div>
+          <div class="form-footer"><p>Fields marked * are required.</p><button type="reset" class="btn btn-outline">Clear form</button><button type="submit" class="btn btn-primary">Generate visitor pass →</button></div>
+        </form>
+      </section>
+
+      <section class="page" id="page-passes">
+        <div class="page-intro"><div><h2>Digital visitor passes</h2><p>View, print or download generated visitor passes.</p></div></div>
+        <div class="toolbar"><input id="passSearch" placeholder="Search by visitor name or pass ID..."><select id="passFilter"><option value="all">All passes</option><option value="Approved">Approved</option><option value="Pending">Pending</option><option value="Rejected">Rejected</option><option value="Inside">Inside</option><option value="Checked out">Checked out</option></select></div>
+        <div id="passGrid" class="pass-grid"></div>
+      </section>
+
+      <section class="page" id="page-tracking">
+        <div class="page-intro"><div><h2>Live visitor tracking</h2><p>Monitor who is currently inside the premises.</p></div><span class="live-label"><i></i> LIVE STATUS</span></div>
+        <div class="stats-grid compact-stats"><article class="stat-card"><span>Currently inside</span><strong id="trackingInside">0</strong></article><article class="stat-card"><span>Checked out today</span><strong id="trackingOut">0</strong></article><article class="stat-card"><span>Expected today</span><strong id="trackingExpected">0</strong></article></div>
+        <article class="panel"><div class="panel-heading"><div><h3>Active visitor log</h3><p>Check visitors in or out using the action buttons.</p></div></div><div class="table-wrap"><table><thead><tr><th>VISITOR</th><th>PASS ID</th><th>HOST</th><th>CHECK-IN</th><th>DURATION</th><th>ACTION</th></tr></thead><tbody id="trackingTable"></tbody></table></div></article>
+        <article class="panel scanner-panel"><div><h3>QR pass verification</h3><p>Use your device camera to scan a pass QR code. Camera access requires HTTPS or localhost.</p><div id="reader"></div><div id="scanResult" class="scan-result">Scanner is ready.</div></div><button id="startScanner" class="btn btn-primary">Start QR scanner</button></article>
+      </section>
+
+      <section class="page" id="page-approvals">
+        <div class="page-intro"><div><h2>Approval requests</h2><p>Review and decide on pending visitor requests.</p></div></div>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>VISITOR</th><th>HOST</th><th>DEPARTMENT</th><th>PURPOSE</th><th>DATE</th><th>DECISION</th></tr></thead><tbody id="approvalTable"></tbody></table></div></article>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="page-intro"><div><h2>Visitor history</h2><p>Search and review all visitor records.</p></div><button class="btn btn-outline" id="exportCsv">↓ Export CSV</button></div>
+        <div class="toolbar"><input id="historySearch" placeholder="Search name, phone, host or pass ID..."><select id="historyStatus"><option value="all">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Inside</option><option>Checked out</option></select></div>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>VISITOR</th><th>CONTACT</th><th>PASS ID</th><th>HOST / DEPT.</th><th>VISIT DATE</th><th>STATUS</th></tr></thead><tbody id="historyTable"></tbody></table></div></article>
+      </section>
+
+      <section class="page" id="page-reports">
+        <div class="page-intro"><div><h2>Reports & analytics</h2><p>Understand visitor patterns and entry activity.</p></div><button class="btn btn-outline" id="reportExport">↓ Export report</button></div>
+        <div class="stats-grid"><article class="stat-card"><span>Total records</span><strong id="reportTotal">0</strong></article><article class="stat-card"><span>Approved</span><strong id="reportApproved">0</strong></article><article class="stat-card"><span>Rejected</span><strong id="reportRejected">0</strong></article><article class="stat-card"><span>Checked out</span><strong id="reportCheckout">0</strong></article></div>
+        <article class="panel chart-panel"><div class="panel-heading"><div><h3>Visitor registrations</h3><p>Daily visitor count for the last seven days</p></div></div><canvas id="reportChart" height="100"></canvas></article>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="modal-backdrop" id="passModal"><div class="modal"><button class="modal-close" id="closeModal">×</button><div id="modalPassContent"></div><div class="modal-actions"><button class="btn btn-outline" id="printPass">Print pass</button><button class="btn btn-primary" id="downloadPass">Download PDF</button></div></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
